@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.classes.Currency;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.ArrayList;
 
 @WebServlet(urlPatterns = {"/currency/*", "/currencies"})
 public class CurrencyServlet extends HttpServlet {
@@ -19,30 +19,27 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-//        PrintWriter writer = response.getWriter();
-
         String servletPath = request.getServletPath();
-        String pathInfo = request.getPathInfo().substring(1);
-        if ("/currencies".equals(servletPath)) {
-            Currency currency = currencyDAO.getCurrency("RUB");
-//            writer.println();
-//            writer.println();
-//            writer.println();
-//            writer.println();
-            System.out.println("NO");
-            System.out.println(currency.getId());
-            System.out.println(currency.getCode());
-            System.out.println(currency.getFullName());
-            System.out.println(currency.getSign());
-        }
-        else {
 
+        if ("/currencies".equals(servletPath)) {
+            System.out.println("Вошел");
+            ArrayList<Currency> currencies = currencyDAO.getAllCurrencies();
+            System.out.println("Получил ответ");
+//            for (Currency currency : currencies){
+//                System.out.println(currency.getId());
+//                System.out.println(currency.getCode());
+//                System.out.println(currency.getFullName());
+//                System.out.println(currency.getSign());
+//            }
+        }
+        else if ("/currency".equals(servletPath)){
+            String pathInfo = request.getPathInfo().substring(1);
             Currency currency = currencyDAO.getCurrency(pathInfo);
 
-            System.out.println(currency.getId());
-            System.out.println(currency.getCode());
-            System.out.println(currency.getFullName());
-            System.out.println(currency.getSign());
+//            System.out.println(currency.getId());
+//            System.out.println(currency.getCode());
+//            System.out.println(currency.getFullName());
+//            System.out.println(currency.getSign());
         }
 
 
@@ -52,5 +49,9 @@ public class CurrencyServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException{
 
+        String servletPath = request.getServletPath();
+        if ("/currencies".equals(servletPath)) {
+//            Currency currency = currencyDAO.setCurrency();
+        }
     }
 }
