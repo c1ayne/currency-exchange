@@ -1,4 +1,6 @@
 package exchange;
 
-public class ExchangeServlet {
+import jakarta.servlet.http.HttpServlet;
+
+public class ExchangeServlet extends HttpServlet {
 }

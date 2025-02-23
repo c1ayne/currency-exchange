@@ -23,12 +23,12 @@ public class CurrencyServlet extends HttpServlet {
 
         if ("/currencies".equals(servletPath)) {
             ArrayList<Currency> currencies = currencyDAO.getAllCurrencies();
-            for (Currency currency : currencies){
-                System.out.println(currency.getId());
-                System.out.println(currency.getCode());
-                System.out.println(currency.getFullName());
-                System.out.println(currency.getSign());
-            }
+//            for (Currency currency : currencies){
+//                System.out.println(currency.getId());
+//                System.out.println(currency.getCode());
+//                System.out.println(currency.getFullName());
+//                System.out.println(currency.getSign());
+//            }
         }
         else if ("/currency".equals(servletPath)){
             String pathInfo = request.getPathInfo().substring(1);
