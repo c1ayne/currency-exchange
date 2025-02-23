@@ -22,9 +22,7 @@ public class CurrencyServlet extends HttpServlet {
         String servletPath = request.getServletPath();
 
         if ("/currencies".equals(servletPath)) {
-            System.out.println("Вошел");
             ArrayList<Currency> currencies = currencyDAO.getAllCurrencies();
-            System.out.println("Получил ответ");
 //            for (Currency currency : currencies){
 //                System.out.println(currency.getId());
 //                System.out.println(currency.getCode());
@@ -35,11 +33,6 @@ public class CurrencyServlet extends HttpServlet {
         else if ("/currency".equals(servletPath)){
             String pathInfo = request.getPathInfo().substring(1);
             Currency currency = currencyDAO.getCurrency(pathInfo);
-
-//            System.out.println(currency.getId());
-//            System.out.println(currency.getCode());
-//            System.out.println(currency.getFullName());
-//            System.out.println(currency.getSign());
         }
 
 
