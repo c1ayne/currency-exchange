@@ -21,7 +21,64 @@ public class ExchangeDAO {
     }
 
     public ArrayList<Exchange> getAllExchangeRates() {
-        return null;
+
+        ArrayList<Exchange> exchanges = new ArrayList<>();
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            String query = "SELECT " +
+                    "er.ID, " +
+                    "bc.ID AS BaseCurrencyID, " +
+                    "bc.fullName AS BaseCurrencyName, " +
+                    "bc.code AS BaseCurrencyCode, " +
+                    "bc.sign AS BaseCurrencySign, " +
+                    "tc.ID AS TargetCurrencyID, " +
+                    "tc.fullName AS TargetCurrencyName, " +
+                    "tc.code AS TargetCurrencyCode, " +
+                    "tc.sign AS TargetCurrencySign, " +
+                    "er.rate " +
+                    "FROM exchangeRates er " +
+                    "JOIN Currencies bc ON er.BaseCurrencyId = bc.ID " +
+                    "JOIN Currencies tc ON er.TargetCurrencyId = tc.ID";
+
+            Connection connection = DriverManager.getConnection(url, name, password);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+                Currency baseCurrency = new Currency(
+                        resultSet.getInt("BaseCurrencyID"),
+                        resultSet.getString("BaseCurrencyCode"),
+                        resultSet.getString("BaseCurrencyName"),
+                        resultSet.getString("BaseCurrencySign")
+                );
+                Currency targetCurrency = new Currency(
+                        resultSet.getInt("TargetCurrencyID"),
+                        resultSet.getString("TargetCurrencyCode"),
+                        resultSet.getString("TargetCurrencyName"),
+                        resultSet.getString("TargetCurrencySign")
+                );
+                exchanges.add(new Exchange(
+                        resultSet.getInt("ID"),
+                        baseCurrency,
+                        targetCurrency,
+                        resultSet.getDouble("rate")
+                ));
+
+                return exchanges;
+            }
+
+            connection.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return exchanges;
     }
 
     public Exchange getExchangeRate(String base,String target) {
@@ -38,11 +95,11 @@ public class ExchangeDAO {
                         "bc.ID AS BaseCurrencyID, " +
                         "bc.fullName AS BaseCurrencyName, " +
                         "bc.code AS BaseCurrencyCode, " +
-                        "bs.sign AS BaseCurrencySign, " +
+                        "bc.sign AS BaseCurrencySign, " +
                         "tc.ID AS TargetCurrencyID, " +
                         "tc.fullName AS TargetCurrencyName, " +
                         "tc.code AS TargetCurrencyCode, " +
-                        "ts.sign AS TargetCurrencySign, " +
+                        "tc.sign AS TargetCurrencySign, " +
                         "er.rate " +
                     "FROM exchangeRates er " +
                     "JOIN Currencies bc ON er.BaseCurrencyId = bc.ID " +
@@ -77,7 +134,7 @@ public class ExchangeDAO {
 
                 connection.close();
 
-                return null;
+                return exchange;
             } else connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
