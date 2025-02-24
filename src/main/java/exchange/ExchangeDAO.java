@@ -142,7 +142,68 @@ public class ExchangeDAO {
         return null;
     }
 
-    public Exchange setExchangeRate() {
+    public Exchange setExchangeRate(String baseCode, String targetCode, double rate) {
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            String query = "WITH inserted AS (" +
+                        "INSERT INTO exchangeRates (BaseCurrencyId, TargetCurrencyId, Rate) " +
+                        "VALUES ((SELECT ID FROM Currencies WHERE code = ?), " +
+                        "(SELECT ID FROM Currencies WHERE code = ?), ?) RETURNING *" +
+                        ") " +
+                    "SELECT " +
+                        "i.ID," +
+                        "bc.ID AS BaseCurrencyID," +
+                        "bc.FullName AS BaseCurrencyName," +
+                        "bc.Code AS BaseCurrencyCode," +
+                        "bc.Sign AS BaseCurrencySign," +
+                        "tc.ID AS TargetCurrencyID," +
+                        "tc.FullName AS TargetCurrencyName," +
+                        "tc.Code AS TargetCurrencyCode," +
+                        "tc.Sign AS TargetCurrencySign," +
+                        "i.Rate " +
+                    "FROM inserted i " +
+                    "JOIN Currencies bc ON i.BaseCurrencyId = bc.ID " +
+                    "JOIN Currencies tc ON i.TargetCurrencyId = tc.ID";
+            Connection connection = DriverManager.getConnection(url, name, password);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, baseCode);
+            preparedStatement.setString(2, targetCode);
+            preparedStatement.setDouble(3, rate);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                Currency baseCurrency = new Currency(
+                        resultSet.getInt("BaseCurrencyID"),
+                        resultSet.getString("BaseCurrencyCode"),
+                        resultSet.getString("BaseCurrencyName"),
+                        resultSet.getString("BaseCurrencySign")
+                );
+                Currency targetCurrency = new Currency(
+                        resultSet.getInt("TargetCurrencyID"),
+                        resultSet.getString("TargetCurrencyCode"),
+                        resultSet.getString("TargetCurrencyName"),
+                        resultSet.getString("TargetCurrencySign")
+                );
+                Exchange exchange = new Exchange(
+                        resultSet.getInt("ID"),
+                        baseCurrency,
+                        targetCurrency,
+                        resultSet.getDouble("rate")
+                );
+
+                connection.close();
+
+                return exchange;
+            } else connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 

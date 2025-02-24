@@ -23,7 +23,8 @@ public class ExchangeServlet extends HttpServlet {
             exchangeDAO.getExchangeRate("USD", "RUB");
         }
         else if ("/exchangeRates".equals(path)) {
-            exchangeDAO.getAllExchangeRates();
+//            exchangeDAO.getAllExchangeRates();
+            exchangeDAO.setExchangeRate("EUR", "USD", 1.5);
         }
     }
 
@@ -46,6 +47,16 @@ public class ExchangeServlet extends HttpServlet {
 
         if ("/exchangeRate".equals(path)) {
 
+        }
+    }
+
+    private void temp(String targetCurrency, String baseCurrency) {
+        if (targetCurrency.compareToIgnoreCase(baseCurrency) < 0) {
+            // Делаю что то
+        } else if (targetCurrency.compareToIgnoreCase(baseCurrency) > 0) {
+            // Делаю то же самое, но меняю слова местами
+        } else {
+            // Слова одинаковые. Кидаю ошибку
         }
     }
 }
