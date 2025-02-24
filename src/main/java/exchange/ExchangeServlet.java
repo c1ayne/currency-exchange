@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import util.classes.Exchange;
 
 import java.io.IOException;
 
@@ -23,8 +24,7 @@ public class ExchangeServlet extends HttpServlet {
             exchangeDAO.getExchangeRate("USD", "RUB");
         }
         else if ("/exchangeRates".equals(path)) {
-//            exchangeDAO.getAllExchangeRates();
-            exchangeDAO.setExchangeRate("EUR", "USD", 1.5);
+            exchangeDAO.getAllExchangeRates();
         }
     }
 
@@ -35,7 +35,7 @@ public class ExchangeServlet extends HttpServlet {
         String path = request.getServletPath();
 
         if ("/exchangeRates".equals(path)) {
-
+//            exchangeDAO.setExchangeRate("EUR", "USD", 1.5);
         }
     }
 
@@ -46,7 +46,7 @@ public class ExchangeServlet extends HttpServlet {
         String path = request.getServletPath();
 
         if ("/exchangeRate".equals(path)) {
-
+//            exchangeDAO.updateExchangeRate("USD", "RUB", 90);
         }
     }
 
