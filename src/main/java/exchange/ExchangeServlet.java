@@ -1,5 +1,6 @@
 package exchange;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.classes.Exchange;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 
 @WebServlet(urlPatterns = {"/exchangeRate/*", "/exchangeRates"})
 public class ExchangeServlet extends HttpServlet {
@@ -18,13 +21,29 @@ public class ExchangeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
         String path = request.getServletPath();
 
         if ("/exchangeRate".equals(path)) {
-            exchangeDAO.getExchangeRate("USD", "RUB");
+            Exchange exchange = exchangeDAO.getExchangeRate("USD", "RUB");
+
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchange);
+            PrintWriter out = response.getWriter();
+            out.print(json);
+            out.flush();
         }
         else if ("/exchangeRates".equals(path)) {
-            exchangeDAO.getAllExchangeRates();
+            ArrayList<Exchange> exchanges = exchangeDAO.getAllExchangeRates();
+
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchanges);
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
+            PrintWriter out = response.getWriter();
+            out.print(json);
+            out.flush();
         }
     }
 
@@ -32,10 +51,18 @@ public class ExchangeServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
         String path = request.getServletPath();
 
         if ("/exchangeRates".equals(path)) {
 //            exchangeDAO.setExchangeRate("EUR", "USD", 1.5);
+
+//            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchange);
+//            PrintWriter out = response.getWriter();
+//            out.print(json);
+//            out.flush();
         }
     }
 
@@ -43,10 +70,18 @@ public class ExchangeServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
         String path = request.getServletPath();
 
         if ("/exchangeRate".equals(path)) {
-//            exchangeDAO.updateExchangeRate("USD", "RUB", 90);
+//            Exchange exchange = exchangeDAO.updateExchangeRate("USD", "RUB", 90);
+
+//            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchange);
+//            PrintWriter out = response.getWriter();
+//            out.print(json);
+//            out.flush();
         }
     }
 

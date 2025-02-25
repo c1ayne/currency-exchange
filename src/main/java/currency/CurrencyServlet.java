@@ -1,5 +1,6 @@
 package currency;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.classes.Currency;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 @WebServlet(urlPatterns = {"/currency/*", "/currencies"})
@@ -19,20 +21,30 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
         String servletPath = request.getServletPath();
 
         if ("/currencies".equals(servletPath)) {
             ArrayList<Currency> currencies = currencyDAO.getAllCurrencies();
-//            for (Currency currency : currencies){
-//                System.out.println(currency.getId());
-//                System.out.println(currency.getCode());
-//                System.out.println(currency.getFullName());
-//                System.out.println(currency.getSign());
-//            }
+
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currencies);
+            PrintWriter out = response.getWriter();
+            out.print(json);
+            out.flush();
+
         }
         else if ("/currency".equals(servletPath)){
             String pathInfo = request.getPathInfo().substring(1);
             Currency currency = currencyDAO.getCurrency(pathInfo);
+
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currency);
+            PrintWriter out = response.getWriter();
+            out.print(json);
+            out.flush();
         }
 
 
@@ -42,9 +54,25 @@ public class CurrencyServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException{
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
         String servletPath = request.getServletPath();
         if ("/currencies".equals(servletPath)) {
-//            Currency currency = currencyDAO.setCurrency();
+
+            String name = request.getParameter("name");
+            String sign = request.getParameter("sign");
+            String code = request.getParameter("code");
+
+            Currency currency = currencyDAO.setCurrency(code, name, sign);
+
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currency);
+            PrintWriter out = response.getWriter();
+            response.setStatus(200);
+            out.print(json);
+            out.flush();
         }
     }
 }
