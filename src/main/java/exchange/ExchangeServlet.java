@@ -8,9 +8,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import util.classes.Exchange;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.net.URLDecoder.decode;
 
 @WebServlet(urlPatterns = {"/exchangeRate/*", "/exchangeRates"})
 public class ExchangeServlet extends HttpServlet {
@@ -29,7 +34,20 @@ public class ExchangeServlet extends HttpServlet {
         String path = request.getServletPath();
 
         if ("/exchangeRate".equals(path)) {
-            Exchange exchange = exchangeDAO.getExchangeRate("USD", "RUB");
+
+            Exchange exchange = null;
+
+            String pathInfo = request.getPathInfo().substring(1);;
+            String base = pathInfo.substring(0, 3);
+            String target = pathInfo.substring(3, 6);
+
+            if (base.compareToIgnoreCase(target) < 0) {
+                exchange = exchangeDAO.getExchangeRate(base, target);
+            } else if (base.compareToIgnoreCase(target) > 0) {
+                exchange = exchangeDAO.getExchangeRate(target, base);
+            } else {
+                // Слова одинаковые. Кидаю ошибку
+            }
 
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchange);
             PrintWriter out = response.getWriter();
@@ -40,7 +58,6 @@ public class ExchangeServlet extends HttpServlet {
             ArrayList<Exchange> exchanges = exchangeDAO.getAllExchangeRates();
 
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchanges);
-            response.setStatus(HttpServletResponse.SC_ACCEPTED);
             PrintWriter out = response.getWriter();
             out.print(json);
             out.flush();
@@ -54,15 +71,30 @@ public class ExchangeServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        ObjectMapper objectMapper = new ObjectMapper();
+
         String path = request.getServletPath();
 
         if ("/exchangeRates".equals(path)) {
-//            exchangeDAO.setExchangeRate("EUR", "USD", 1.5);
 
-//            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchange);
-//            PrintWriter out = response.getWriter();
-//            out.print(json);
-//            out.flush();
+            Exchange exchange = null;
+
+            String baseCurrencyCode = request.getParameter("baseCurrencyCode");
+            String targetCurrencyCode = request.getParameter("targetCurrencyCode");
+            double rate = Double.parseDouble(request.getParameter("rate"));
+
+            if (baseCurrencyCode.compareToIgnoreCase(targetCurrencyCode) < 0) {
+                exchange = exchangeDAO.setExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
+            } else if (baseCurrencyCode.compareToIgnoreCase(targetCurrencyCode) > 0) {
+                exchange = exchangeDAO.setExchangeRate(targetCurrencyCode, baseCurrencyCode, 1/rate);
+            } else {
+                // Слова одинаковые. Кидаю ошибку
+            }
+
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchange);
+            PrintWriter out = response.getWriter();
+            out.print(json);
+            out.flush();
         }
     }
 
@@ -73,25 +105,57 @@ public class ExchangeServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        String path = request.getServletPath();
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        if ("/exchangeRate".equals(path)) {
-//            Exchange exchange = exchangeDAO.updateExchangeRate("USD", "RUB", 90);
+        String servletPath = request.getServletPath();
 
-//            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchange);
-//            PrintWriter out = response.getWriter();
-//            out.print(json);
-//            out.flush();
+        if ("/exchangeRate".equals(servletPath)) {
+
+            Exchange exchange = null;
+            String pathInfo = request.getPathInfo().substring(1);
+
+            String base = pathInfo.substring(0, 3);
+            String target = pathInfo.substring(3, 6);
+            double rate = catchRate(request);
+
+            if (base.compareToIgnoreCase(target) < 0) {
+                exchange = exchangeDAO.updateExchangeRate(base, target, rate);
+            } else if (base.compareToIgnoreCase(target) > 0) {
+                exchange = exchangeDAO.updateExchangeRate(target, base, 1/rate);
+            } else {
+                // Слова одинаковые. Кидаю ошибку
+            }
+
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(exchange);
+            PrintWriter out = response.getWriter();
+            out.print(json);
+            out.flush();
         }
     }
 
-    private void temp(String targetCurrency, String baseCurrency) {
-        if (targetCurrency.compareToIgnoreCase(baseCurrency) < 0) {
-            // Делаю что то
-        } else if (targetCurrency.compareToIgnoreCase(baseCurrency) > 0) {
-            // Делаю то же самое, но меняю слова местами
-        } else {
-            // Слова одинаковые. Кидаю ошибку
-        }
+    private double catchRate(HttpServletRequest request) throws IOException {
+        String body = new BufferedReader(new InputStreamReader(request.getInputStream()))
+                .lines()
+                .collect(Collectors.joining("\n"));
+
+        Map<String, String> parameters = Arrays.stream(body.split("&"))
+                .map(pair -> pair.split("="))
+                .collect(Collectors.toMap(
+                        keyValue -> {
+                            try {
+                                return decode(keyValue[0], "UTF-8");
+                            } catch (UnsupportedEncodingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        },
+                        keyValue -> {
+                            try {
+                                return decode(keyValue[1], "UTF-8");
+                            } catch (UnsupportedEncodingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                ));
+        return Double.parseDouble(parameters.get("rate"));
     }
 }

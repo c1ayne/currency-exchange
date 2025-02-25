@@ -34,6 +34,7 @@ public class CurrencyServlet extends HttpServlet {
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currencies);
             PrintWriter out = response.getWriter();
             out.print(json);
+//            response.setStatus(305);
             out.flush();
 
         }
@@ -70,7 +71,6 @@ public class CurrencyServlet extends HttpServlet {
 
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currency);
             PrintWriter out = response.getWriter();
-            response.setStatus(200);
             out.print(json);
             out.flush();
         }
