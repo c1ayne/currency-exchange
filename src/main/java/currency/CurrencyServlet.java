@@ -21,31 +21,55 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        try {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = "";
 
-        String servletPath = request.getServletPath();
+            String servletPath = request.getServletPath();
 
-        if ("/currencies".equals(servletPath)) {
-            ArrayList<Currency> currencies = currencyDAO.getAllCurrencies();
+            if ("/currencies".equals(servletPath)) {
+                ArrayList<Currency> currencies = currencyDAO.getAllCurrencies();
 
-            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currencies);
-            PrintWriter out = response.getWriter();
-            out.print(json);
-//            response.setStatus(305);
-            out.flush();
+                json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currencies);
+                PrintWriter out = response.getWriter();
+                out.print(json);
+                response.setStatus(200);
+                out.flush();
 
-        }
-        else if ("/currency".equals(servletPath)){
-            String pathInfo = request.getPathInfo().substring(1);
-            Currency currency = currencyDAO.getCurrency(pathInfo);
+            }
+            else if ("/currency".equals(servletPath)){
+                String pathInfo = request.getPathInfo();
+                if (pathInfo == null || pathInfo.equals("/")) {
+                    json = objectMapper.writeValueAsString("Код валюты отсутствует в адресе");
+                    response.setStatus(400);
+                    PrintWriter msg = response.getWriter();
+                    msg.print(json);
+                    msg.flush();
+                    return;
+                }
+                pathInfo = pathInfo.substring(1);
+                Currency currency = currencyDAO.getCurrency(pathInfo);
 
-            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currency);
-            PrintWriter out = response.getWriter();
-            out.print(json);
-            out.flush();
+                if (currency == null) {
+                    json = objectMapper.writeValueAsString("Валюта не найдена");
+                    response.setStatus(404);
+                    PrintWriter msg = response.getWriter();
+                    msg.print(json);
+                    msg.flush();
+                    return;
+                }
+
+                json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currency);
+                PrintWriter out = response.getWriter();
+                out.print(json);
+                response.setStatus(200);
+                out.flush();
+            }
+        } catch (IOException e) {
+            response.sendError(500, e.getMessage());
         }
 
 
@@ -55,24 +79,48 @@ public class CurrencyServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException{
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        try {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = "";
 
-        String servletPath = request.getServletPath();
-        if ("/currencies".equals(servletPath)) {
+            String servletPath = request.getServletPath();
+            if ("/currencies".equals(servletPath)) {
 
-            String name = request.getParameter("name");
-            String sign = request.getParameter("sign");
-            String code = request.getParameter("code");
+                String name = request.getParameter("name");
+                String sign = request.getParameter("sign");
+                String code = request.getParameter("code");
 
-            Currency currency = currencyDAO.setCurrency(code, name, sign);
+                if (name == null || sign == null || code == null) {
+                    json = objectMapper.writeValueAsString("Отсутствует нужное поле формы");
+                    response.setStatus(400);
+                    PrintWriter msg = response.getWriter();
+                    msg.print(json);
+                    msg.flush();
+                    return;
+                }
 
-            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currency);
-            PrintWriter out = response.getWriter();
-            out.print(json);
-            out.flush();
+                if (currencyDAO.getCurrency(code) != null) {
+                    json = objectMapper.writeValueAsString("Валюта с таким кодом уже существует");
+                    response.setStatus(409);
+                    PrintWriter msg = response.getWriter();
+                    msg.print(json);
+                    msg.flush();
+                    return;
+                }
+
+                Currency currency = currencyDAO.setCurrency(code, name, sign);
+
+                json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currency);
+                PrintWriter out = response.getWriter();
+                out.print(json);
+                response.setStatus(201);
+                out.flush();
+            }
+        } catch (IOException e) {
+            response.sendError(500, e.getMessage());
         }
     }
 }
