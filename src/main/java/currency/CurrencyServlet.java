@@ -26,7 +26,7 @@ public class CurrencyServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
 
             ObjectMapper objectMapper = new ObjectMapper();
-            String json = "";
+            String json;
 
             String servletPath = request.getServletPath();
 
@@ -84,7 +84,7 @@ public class CurrencyServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
 
             ObjectMapper objectMapper = new ObjectMapper();
-            String json = "";
+            String json;
 
             String servletPath = request.getServletPath();
             if ("/currencies".equals(servletPath)) {
