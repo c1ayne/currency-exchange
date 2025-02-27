@@ -69,8 +69,6 @@ public class ExchangeDAO {
                         targetCurrency,
                         resultSet.getDouble("rate")
                 ));
-
-                return exchanges;
             }
 
             connection.close();

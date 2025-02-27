@@ -44,4 +44,14 @@ public class Exchange {
     public void setRate(double rate) {
         this.rate = rate;
     }
+
+    public void swap() {
+        Currency temp = baseCurrency;
+        baseCurrency = targetCurrency;
+        targetCurrency = temp;
+    }
+
+    public void reverseRate() {
+        rate = 1/rate;
+    }
 }

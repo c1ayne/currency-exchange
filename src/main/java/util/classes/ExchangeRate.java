@@ -7,6 +7,8 @@ public class ExchangeRate {
     private double amount;
     private double convertedAmount;
 
+    public ExchangeRate() {}
+
     public ExchangeRate(Currency baseCurrency,
                         Currency targetCurrency,
                         double rate,
