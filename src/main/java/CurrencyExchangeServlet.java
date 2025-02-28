@@ -32,7 +32,21 @@ public class CurrencyExchangeServlet extends HttpServlet {
         String base = request.getParameter("from");
         String target = request.getParameter("to");
         String usd = "USD";
-        double amount = Double.parseDouble(request.getParameter("amount"));
+        double amount = 0;
+        try {
+            amount = Double.parseDouble(request.getParameter("amount"));
+        } catch (NumberFormatException e) {
+            System.out.println("error");
+        }
+
+        if (base == null || target == null || amount == 0) {
+            json = objectMapper.writeValueAsString("Отсутствует поле ввода");
+            response.setStatus(400);
+            PrintWriter msg = response.getWriter();
+            msg.print(json);
+            msg.flush();
+            return;
+        }
 
         exchangeRate.setAmount(amount);
 
@@ -59,7 +73,6 @@ public class CurrencyExchangeServlet extends HttpServlet {
         } catch (IOException e) {
             System.out.println("вышла ошибка");
         }
-        System.out.println(exchange == null);
         if (exchange != null) {
             exchangeRate.setBaseCurrency(exchange.getBaseCurrency());
             exchangeRate.setTargetCurrency(exchange.getTargetCurrency());
