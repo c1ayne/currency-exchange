@@ -15,9 +15,9 @@ public class ExchangeRate {
                         double amount) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
-        this.rate = rate;
+        this.rate = (double) Math.round(rate * 100) / 100;
         this.amount = amount;
-        convertedAmount = rate * amount;
+        convertedAmount = (double) Math.round((rate * amount) * 100) / 100;
     }
 
     public Currency getBaseCurrency() {
@@ -41,7 +41,7 @@ public class ExchangeRate {
     }
 
     public void setRate(double rate) {
-        this.rate = rate;
+        this.rate = (double) Math.round(rate * 100) / 100;
     }
 
     public double getAmount() {

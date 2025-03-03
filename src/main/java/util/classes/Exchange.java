@@ -10,7 +10,7 @@ public class Exchange {
         this.id = id;
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
-        this.rate = rate;
+        this.rate = (double) Math.round(rate * 100) / 100;
     }
 
     public int getId() {
@@ -42,7 +42,7 @@ public class Exchange {
     }
 
     public void setRate(double rate) {
-        this.rate = rate;
+        this.rate = (double) Math.round(rate * 100) / 100;
     }
 
     public void swap() {
