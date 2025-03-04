@@ -102,7 +102,9 @@ public class CurrencyServlet extends HttpServlet {
                     return;
                 }
 
-                if (currencyDAO.getCurrency(code) != null) {
+                Currency currency = currencyDAO.setCurrency(code, name, sign);
+
+                if (currency == null) {
                     json = objectMapper.writeValueAsString("Валюта с таким кодом уже существует");
                     response.setStatus(409);
                     PrintWriter msg = response.getWriter();
@@ -110,8 +112,6 @@ public class CurrencyServlet extends HttpServlet {
                     msg.flush();
                     return;
                 }
-
-                Currency currency = currencyDAO.setCurrency(code, name, sign);
 
                 json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(currency);
                 PrintWriter out = response.getWriter();
