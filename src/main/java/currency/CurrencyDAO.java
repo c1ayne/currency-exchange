@@ -1,5 +1,6 @@
 package currency;
 
+import util.classes.ConnectionPool;
 import util.classes.Currency;
 
 import java.sql.*;
@@ -32,7 +33,7 @@ public class CurrencyDAO {
         }
 
         try {
-            Connection connection = DriverManager.getConnection(url, name, password);
+            Connection connection = ConnectionPool.getDataSource().getConnection();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM currencies");
 
@@ -64,7 +65,7 @@ public class CurrencyDAO {
 
         try {
             String query = "SELECT * FROM currencies WHERE code = ?";
-            Connection connection = DriverManager.getConnection(url, name, password);
+            Connection connection = ConnectionPool.getDataSource().getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, code);
             ResultSet resultSet = statement.executeQuery();
@@ -101,7 +102,7 @@ public class CurrencyDAO {
 
         try {
             String query = "INSERT INTO currencies (code, fullname, sign) VALUES (?, ?, ?) RETURNING *";
-            Connection connection = DriverManager.getConnection(url, name, password);
+            Connection connection = ConnectionPool.getDataSource().getConnection();
 
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, code);

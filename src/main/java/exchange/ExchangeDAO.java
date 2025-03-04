@@ -1,5 +1,6 @@
 package exchange;
 
+import util.classes.ConnectionPool;
 import util.classes.Currency;
 import util.classes.Exchange;
 
@@ -46,7 +47,7 @@ public class ExchangeDAO {
                     "JOIN Currencies bc ON er.BaseCurrencyId = bc.ID " +
                     "JOIN Currencies tc ON er.TargetCurrencyId = tc.ID";
 
-            Connection connection = DriverManager.getConnection(url, name, password);
+            Connection connection = ConnectionPool.getDataSource().getConnection();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
@@ -104,7 +105,7 @@ public class ExchangeDAO {
                     "JOIN Currencies tc ON er.TargetCurrencyId = tc.ID " +
                     "WHERE bc.code = ? AND tc.code = ?";
 
-            Connection connection = DriverManager.getConnection(url, name, password);
+            Connection connection = ConnectionPool.getDataSource().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, base);
             preparedStatement.setString(2, target);
@@ -168,7 +169,7 @@ public class ExchangeDAO {
                     "FROM inserted i " +
                     "JOIN Currencies bc ON i.BaseCurrencyId = bc.ID " +
                     "JOIN Currencies tc ON i.TargetCurrencyId = tc.ID";
-            Connection connection = DriverManager.getConnection(url, name, password);
+            Connection connection = ConnectionPool.getDataSource().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, baseCode);
             preparedStatement.setString(2, targetCode);
@@ -238,7 +239,7 @@ public class ExchangeDAO {
                     "FROM updated u " +
                     "JOIN Currencies bc ON u.BaseCurrencyId = bc.ID " +
                     "JOIN Currencies tc ON u.TargetCurrencyId = tc.ID";
-            Connection connection = DriverManager.getConnection(url, name, password);
+            Connection connection = ConnectionPool.getDataSource().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setDouble(1, rate);
             preparedStatement.setString(2, baseCode);
