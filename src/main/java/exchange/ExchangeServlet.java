@@ -145,27 +145,20 @@ public class ExchangeServlet extends HttpServlet {
                 }
 
                 if (baseCurrencyCode.compareToIgnoreCase(targetCurrencyCode) < 0) {
-                    if (exchangeDAO.getExchangeRate(baseCurrencyCode, targetCurrencyCode) != null) {
-                        json = objectMapper.writeValueAsString("Валютная пара с таким кодом уже существует");
-                        response.setStatus(409);
-                        PrintWriter msg = response.getWriter();
-                        msg.print(json);
-                        msg.flush();
-                        return;
-                    }
                     exchange = exchangeDAO.setExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
                 } else if (baseCurrencyCode.compareToIgnoreCase(targetCurrencyCode) > 0) {
-                    if (exchangeDAO.getExchangeRate(targetCurrencyCode, baseCurrencyCode) != null) {
-                        json = objectMapper.writeValueAsString("Валютная пара с таким кодом уже существует");
-                        response.setStatus(409);
-                        PrintWriter msg = response.getWriter();
-                        msg.print(json);
-                        msg.flush();
-                        return;
-                    }
                     exchange = exchangeDAO.setExchangeRate(targetCurrencyCode, baseCurrencyCode, 1/rate);
                 } else {
                     json = objectMapper.writeValueAsString("Вы ввели две одинаковые валюты");
+                    response.setStatus(409);
+                    PrintWriter msg = response.getWriter();
+                    msg.print(json);
+                    msg.flush();
+                    return;
+                }
+
+                if (exchange == null) {
+                    json = objectMapper.writeValueAsString("Валютная пара с таким кодом уже существует");
                     response.setStatus(409);
                     PrintWriter msg = response.getWriter();
                     msg.print(json);

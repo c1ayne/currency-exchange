@@ -200,6 +200,9 @@ public class ExchangeDAO {
                 return exchange;
             } else connection.close();
         } catch (SQLException e) {
+            if (e.getSQLState().equals("23505")) {
+                return null;
+            }
             throw new RuntimeException(e);
         }
         return null;
