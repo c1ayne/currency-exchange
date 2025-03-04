@@ -22,8 +22,6 @@ public class CurrencyServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json;
@@ -80,8 +78,6 @@ public class CurrencyServlet extends HttpServlet {
             throws ServletException, IOException{
 
         try {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json;

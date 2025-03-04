@@ -27,8 +27,6 @@ public class ExchangeServlet extends HttpServlet {
         throws ServletException, IOException {
 
         try {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json;
@@ -98,8 +96,6 @@ public class ExchangeServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
 
             ObjectMapper objectMapper = new ObjectMapper();
             CurrencyDAO currencyDAO = new CurrencyDAO();
@@ -182,8 +178,6 @@ public class ExchangeServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
 
             ObjectMapper objectMapper = new ObjectMapper();
 
